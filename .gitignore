@@ -1,0 +1,5 @@
+/.flutter-plugins
+/.flutter-plugins-dependencies
+/lib/ffmpeg.exe
+/lib/ffplay.exe
+/lib/ffprobe.exe
