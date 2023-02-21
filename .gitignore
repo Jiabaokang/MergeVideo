@@ -3,3 +3,6 @@
 /lib/ffmpeg.exe
 /lib/ffplay.exe
 /lib/ffprobe.exe
+/analysis_options.yaml
+/MergeVideo.iml
+/.metadata
