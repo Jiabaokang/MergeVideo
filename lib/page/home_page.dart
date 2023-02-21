@@ -25,6 +25,7 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: Center(
           child: Column(
+            mainAxisSize: MainAxisSize.max,
             children: [
               TextButton.icon(
                 label: const Text('合并文件'),

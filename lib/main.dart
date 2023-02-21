@@ -63,8 +63,16 @@ class _MainAppState extends State<MainApp> {
         appBar: NavigationAppBar(
             height: 40,
             leading: const Icon(FluentIcons.a_a_d_logo),
-            title: const DragToMoveArea(
-              child: Text('合并视频'),
+            //拖动可以移动区域
+            title:  DragToMoveArea(
+              child:  Container(
+                width: 120,
+                height: 40,
+                // decoration: BoxDecoration(
+                //     borderRadius: BorderRadius.circular(100),
+                //     gradient: RadialGradient(colors: [Colors.black, Colors.blue])),
+                child: const Text('合并视频'),
+              )
             ),
             actions: Row(
               mainAxisAlignment: MainAxisAlignment.end,
