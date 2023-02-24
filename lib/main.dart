@@ -66,12 +66,13 @@ class _MainAppState extends State<MainApp> {
             //拖动可以移动区域
             title:  DragToMoveArea(
               child:  Container(
-                width: 120,
+                width: 300,
                 height: 40,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    gradient: RadialGradient(colors: [Colors.black, Colors.blue])),
-                child: const Center(child: Text('合并视频')),
+                // decoration: BoxDecoration(
+                //     borderRadius: BorderRadius.circular(100),
+                //     gradient: RadialGradient(colors: [Colors.black, Colors.blue])),
+                child: const Padding(padding: EdgeInsets.only(left: 10,top: 10),
+                child: Text('合并视频')),
               )
             ),
             actions: Row(
