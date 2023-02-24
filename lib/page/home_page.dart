@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'dart:io';
 import 'package:ffmpeg_cli/ffmpeg_cli.dart';
@@ -16,17 +15,45 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       appBar: Platform.isWindows
           ? null
           : AppBar(
-        title: const Text('合并视频'),
-      ),
+              title: const Text('合并视频'),
+            ),
       body: SafeArea(
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 200,
+                      color: Colors.purple,
+                      child: TextButton.icon(
+                          onPressed: selectFirst,
+                          icon: const Icon(Icons.file_open),
+                          label: const Text("选择第一个文件")),
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      height: 200,
+                      color: Colors.purple,
+                      child: TextButton.icon(
+                          onPressed: selectFirst,
+                          icon: const Icon(Icons.file_open),
+                          label: const Text("选择第二个文件")),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 40,
+              ),
               TextButton.icon(
                 label: const Text('合并文件'),
                 icon: const Icon(Icons.video_file),
@@ -38,17 +65,19 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
 
+  ///选择第一个文件
+  void selectFirst() {}
+}
 
 ///执行视频合并
 void executeMergeVideo() async {
   final commandBuilder = FfmpegBuilder();
   final butterflyStream = commandBuilder.addAsset("assets/Butterfly-209.mp4");
   final beeStream =
-  commandBuilder.addAsset("C:/Users/jiaba/Videos/Captures/bee.mp4");
+      commandBuilder.addAsset("C:/Users/jiaba/Videos/Captures/bee.mp4");
   final outputStream =
-  commandBuilder.createStream(hasVideo: true, hasAudio: true);
+      commandBuilder.createStream(hasVideo: true, hasAudio: true);
 
   commandBuilder.addFilterChain(
     //我们使用“concat”过滤器将两个示例视频合并为一个。

@@ -68,10 +68,10 @@ class _MainAppState extends State<MainApp> {
               child:  Container(
                 width: 120,
                 height: 40,
-                // decoration: BoxDecoration(
-                //     borderRadius: BorderRadius.circular(100),
-                //     gradient: RadialGradient(colors: [Colors.black, Colors.blue])),
-                child: const Text('合并视频'),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(100),
+                    gradient: RadialGradient(colors: [Colors.black, Colors.blue])),
+                child: const Center(child: Text('合并视频')),
               )
             ),
             actions: Row(
