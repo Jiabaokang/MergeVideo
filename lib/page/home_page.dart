@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:ffmpeg_cli/ffmpeg_cli.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 
@@ -17,6 +18,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String? firstFilePath;
   String? secondFilePath;
+  String? mergeAfterVideoPath;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +40,7 @@ class _HomePageState extends State<HomePage> {
                           borderRadius: BorderRadius.circular(10)),
                       child: TextButton.icon(
                           onPressed: () => selectFile(1),
-                          icon: const Icon(Icons.file_open),
+                          icon: const Icon(Icons.video_collection),
                           label: const Text("选择第一个文件",
                               style: TextStyle(color: Colors.white))),
                     ),
@@ -48,11 +50,11 @@ class _HomePageState extends State<HomePage> {
                       height: 200,
                       margin: EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                          color: Colors.blueAccent,
+                          color: Colors.deepOrangeAccent,
                           borderRadius: BorderRadius.circular(10)),
                       child: TextButton.icon(
                         onPressed: () => selectFile(2),
-                        icon: const Icon(Icons.file_open),
+                        icon: const Icon(Icons.video_call),
                         label: Text("选择第二个文件",
                             style: TextStyle(color: Colors.white)),
                       ),
@@ -60,17 +62,20 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
-              const SizedBox(
-                height: 40,
-              ),
+              showNewVideoPath(),
               ///合并按钮
               Container(
                 height: 45,
                 width: 200,
                 child: MaterialButton(
-                  onPressed: () =>{
-                    if(checkSelectVideo()){
-                      executeMergeVideo(firstFilePath!,secondFilePath!)
+                  onPressed: () async {
+                    if (checkSelectVideo(context)) {
+                      String newVideoPath = await executeMergeVideo(
+                          firstFilePath!, secondFilePath!);
+                      if (newVideoPath.isNotEmpty)
+                        setState(() {
+                          mergeAfterVideoPath = newVideoPath;
+                        });
                     }
                   },
                   elevation: 3,
@@ -88,14 +93,34 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  showNewVideoPath(){
+    if(mergeAfterVideoPath != null){
+      return SizedBox(height: 40,
+          child: SelectableText("合并后的视频路劲：$mergeAfterVideoPath"),
+    );
+    }else{
+      return SizedBox(height: 40);
+    }
+  }
+
   ///校验视频是否选择完成
-  bool checkSelectVideo() {
-    if(firstFilePath == null){
-      //TODO 提示选择第一文件
+  bool checkSelectVideo(BuildContext cex) {
+    if (firstFilePath == null) {
+      showToast("请选择第一个视频文件",
+          context: cex,
+          position: StyledToastPosition.bottom,
+          duration: Duration(milliseconds: 2000),
+          animation: StyledToastAnimation.scale,
+          reverseAnimation: StyledToastAnimation.scale);
       return false;
     }
-    if(secondFilePath == null){
-      //TODO 提示请选择而第二个文件
+    if (secondFilePath == null) {
+      showToast("请选择第二个视频文件",
+          context: cex,
+          position: StyledToastPosition.bottom,
+          duration: Duration(milliseconds: 2000),
+          animation: StyledToastAnimation.scale,
+          reverseAnimation: StyledToastAnimation.scale);
       return false;
     }
     print("校验结果==true");
@@ -115,22 +140,17 @@ class _HomePageState extends State<HomePage> {
           secondFilePath = fileResult.files.first.path!;
           print("第二个文件路径==$secondFilePath");
         }
-        setState(() {});
       }
     }
   }
 }
 
-///执行视频合并
-void executeMergeVideo(String firstVideoPath,String secondVideoPath) async {
+///执行视频合并,合并完成后返回，新视频的文件路径
+Future<String> executeMergeVideo(
+    String firstVideoPath, String secondVideoPath) async {
   final commandBuilder = FfmpegBuilder();
-
-  // final butterflyStream = commandBuilder.addAsset("assets/Butterfly-209.mp4");
-  // final beeStream =
-  //     commandBuilder.addAsset("C:/Users/jiaba/Videos/Captures/bee.mp4");
-
-  final butterflyStream = commandBuilder.addAsset(firstVideoPath);
-  final beeStream = commandBuilder.addAsset(secondVideoPath);
+  final firstVideoStream = commandBuilder.addAsset(firstVideoPath);
+  final secondStream = commandBuilder.addAsset(secondVideoPath);
 
   final outputStream =
       commandBuilder.createStream(hasVideo: true, hasAudio: true);
@@ -140,8 +160,8 @@ void executeMergeVideo(String firstVideoPath,String secondVideoPath) async {
     FilterChain(
       inputs: [
         //“concat”过滤器的输入是FFMPEG生成的源视频的输入ID。
-        butterflyStream,
-        beeStream,
+        firstVideoStream,
+        secondStream,
       ],
       filters: [
         //使用“concat”过滤器将两个源视频一个接一个地组合起来。
@@ -159,7 +179,8 @@ void executeMergeVideo(String firstVideoPath,String secondVideoPath) async {
     ),
   );
   Directory? tempDir = await getDownloadsDirectory();
-  String outputFilepath = path.join(tempDir!.path, "mergeVideo_${DateTime.now().microsecond}.mp4");
+  String outputFilepath =
+      path.join(tempDir!.path, "mergeVideo_${DateTime.now().millisecond}.mp4");
   print("fileName==>$outputFilepath");
 
   ///构建一个查询命令
@@ -195,4 +216,5 @@ void executeMergeVideo(String firstVideoPath,String secondVideoPath) async {
   await process.exitCode;
 
   print('DONE');
+  return outputFilepath;
 }
